@@ -13,6 +13,6 @@ WORKDIR /config
 
 VOLUME ["/config/.ssh"]
 
-ENTRYPOINT ["/usr/bin/ssh", "-F", "/config/.ssh/config"]
+ENTRYPOINT ["/usr/bin/ssh"]
 
 CMD ["-V"]
