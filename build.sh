@@ -43,6 +43,7 @@ then
   fi
 
   IMAGE_NAME="$1"
+  shift
   echo "Building image: $IMAGE_NAME" >&2
 
   case "$1" in
