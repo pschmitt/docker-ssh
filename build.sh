@@ -17,10 +17,18 @@ get_base_image() {
 get_available_architectures() {
   local image="$1"
   local tag="${2:-latest}"
+  local res
 
-  docker buildx imagetools inspect --raw "${image}:${tag}" | \
+  res=$(docker buildx imagetools inspect --raw "${image}:${tag}" | \
     jq -r '.manifests[].platform | .os + "/" + .architecture + "/" + .variant' | \
-    sed 's#/$##' | sort
+    sed 's#/$##' | sort)
+
+  if [[ -n "$DISABLED_ARCH" ]]
+  then
+    grep -vE "$DISABLED_ARCH" <<< "$res" && true
+  else
+    echo "$res"
+  fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]
@@ -42,12 +50,17 @@ then
       usage
       exit 0
       ;;
+    -d|--disable|--disable-arch)
+      DISABLED_ARCH="$2"
+      shift 2
+      ;;
   esac
 
   read -r base_image base_image_tag <<< "$(get_base_image)"
 
   # shellcheck disable=2207
   platforms=($(get_available_architectures "${base_image}" "${base_image_tag}"))
+  echo "Building platforms: ${platforms[*]}"
 
   PUSH_IMAGE="${PUSH_IMAGE:-true}"
   BUILD_TYPE="${BUILD_TYPE:-manual}"

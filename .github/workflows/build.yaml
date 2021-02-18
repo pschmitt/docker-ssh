@@ -37,6 +37,6 @@ jobs:
 
       - name: Run the build script
         id: build
-        run: ./build.sh pschmitt/ssh
+        run: ./build.sh pschmitt/ssh -d s390x
 
 # vim: set ft=yaml et ts=2 sw=2 :
